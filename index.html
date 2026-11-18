@@ -1,0 +1,1033 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090b10">
+<title>NEXORA BOT</title>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+:root {
+  --bg: #090b10;
+  --panel: #11151e;
+  --panel2: #171d29;
+  --border: #252d3b;
+  --text: #f2f5fa;
+  --muted: #8994a6;
+  --red: #ff3d52;
+  --green: #32d69a;
+  --blue: #5d9cff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+.app {
+  width: min(1100px, 100%);
+  margin: auto;
+  padding: 22px;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+.logo {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+.logo span { color: var(--red); }
+.status {
+  color: var(--muted);
+  font-size: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 9px 13px;
+  border-radius: 30px;
+}
+.status i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  margin-right: 7px;
+}
+.status.online i { background: var(--green); }
+.hero {
+  padding: 25px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(130deg, #171c29, #10131b 70%);
+  margin-bottom: 18px;
+}
+.hero h1 { margin: 0 0 8px; font-size: 28px; }
+.hero p { color: var(--muted); margin: 0; line-height: 1.6; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  min-width: 0;
+}
+.panel h2 { margin: 0 0 17px; font-size: 17px; }
+.panel p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.full { grid-column: 1 / -1; }
+label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 14px 0 7px;
+}
+input, textarea {
+  width: 100%;
+  background: #090d14;
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px;
+  outline: none;
+}
+input:focus, textarea:focus { border-color: var(--red); }
+textarea { resize: vertical; min-height: 95px; }
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 15px;
+  font-weight: 700;
+  transition: .15s;
+}
+button:disabled { opacity: .45; cursor: not-allowed; }
+.primary { background: var(--red); color: white; }
+.secondary {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: white;
+}
+.success { background: #15392f; color: var(--green); }
+.danger { background: #3a1820; color: #ff7b88; }
+button:not(:disabled):active { transform: scale(.98); }
+.actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 13px;
+}
+.account {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #0b1018;
+  border: 1px solid var(--border);
+  padding: 13px;
+  border-radius: 12px;
+}
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #252c3b;
+  display: grid;
+  place-items: center;
+  font-size: 19px;
+}
+.account small { display: block; color: var(--muted); margin-top: 5px; }
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.stat {
+  padding: 15px;
+  border-radius: 12px;
+  background: #0b1018;
+  border: 1px solid var(--border);
+}
+.stat strong { display: block; font-size: 24px; }
+.stat span { font-size: 11px; color: var(--muted); }
+.log-list {
+  max-height: 230px;
+  overflow-y: auto;
+}
+.log {
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.log time { color: var(--muted); display: block; font-size: 10px; }
+.log.ok { color: var(--green); }
+.log.error { color: #ff7887; }
+.log.info { color: var(--blue); }
+.notice {
+  background: #211c12;
+  border: 1px solid #514021;
+  color: #eacb83;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 13px;
+}
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 25px 0 10px;
+}
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #202838;
+  border: 1px solid var(--border);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  display: none;
+  max-width: 90%;
+  z-index: 10;
+  font-size: 13px;
+}
+@media(max-width:700px) {
+  .app { padding: 14px; }
+  .grid { grid-template-columns: 1fr; }
+  .full { grid-column: auto; }
+  .hero h1 { font-size: 23px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="logo">NEXORA <span>BOT</span></div>
+  <div class="status" id="status"><i></i><span id="statusText">Not connected</span></div>
+</header>
+
+<section class="hero">
+  <h1>YouTube Live Assistant</h1>
+  <p>Manage your live chat message, save your settings locally, and send messages through your connected YouTube account.</p>
+</section>
+
+<div class="grid">
+
+<section class="panel">
+  <h2>01 / Google Account</h2>
+
+  <div class="account">
+    <div class="avatar">▶</div>
+    <div>
+      <strong id="accountName">Not logged in</strong>
+      <small id="accountInfo">Connect your YouTube account</small>
+    </div>
+  </div>
+
+  <label>Google OAuth Client ID</label>
+  <input id="clientId" placeholder="YOUR_CLIENT_ID.apps.googleusercontent.com">
+
+  <div class="actions">
+    <button class="primary" id="loginBtn">Connect Google</button>
+    <button class="secondary" id="logoutBtn" disabled>Disconnect</button>
+  </div>
+
+  <div class="notice">
+    Your access token is kept in memory only. It is not saved in local storage.
+  </div>
+</section>
+
+<section class="panel">
+  <h2>02 / Live Stream</h2>
+
+  <label>YouTube Live URL or Video ID</label>
+  <input id="videoInput" placeholder="https://www.youtube.com/watch?v=...">
+
+  <div class="actions">
+    <button class="secondary" id="checkBtn">Check Live Stream</button>
+  </div>
+
+  <div class="account" style="margin-top:14px">
+    <div class="avatar">LIVE</div>
+    <div>
+      <strong id="liveTitle">No stream selected</strong>
+      <small id="liveInfo">Waiting for a stream</small>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>03 / Message Studio</h2>
+
+  <label>Your message</label>
+  <textarea id="messageInput" maxlength="200" placeholder="Write your message..."></textarea>
+
+  <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:7px">
+    <span>Maximum 200 characters</span>
+    <span id="charCount">0 / 200</span>
+  </div>
+
+  <div class="actions">
+    <button class="secondary" id="saveBtn">Save Message</button>
+    <button class="secondary" id="previewBtn">Preview</button>
+  </div>
+
+  <div class="notice" id="previewBox" style="display:none">
+    <strong>Message preview</strong>
+    <p id="previewText"></p>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>04 / Send Message</h2>
+
+  <p>Sending requires a connected Google account and an active live chat.</p>
+
+  <div class="notice">
+    Make sure the live chat is open to everyone before sending. This page cannot independently verify the chat's subscriber-only setting.
+  </div>
+
+  <label>
+    <input type="checkbox" id="confirmChat" style="width:auto;margin-right:7px">
+    I confirm that the live chat is open to everyone.
+  </label>
+
+  <div class="actions">
+    <button class="primary" id="sendBtn" disabled>Send Message</button>
+  </div>
+</section>
+
+<section class="panel full">
+  <h2>05 / Dashboard Statistics</h2>
+  <div class="stat-grid">
+    <div class="stat">
+      <strong id="sentCount">0</strong>
+      <span>Messages sent</span>
+    </div>
+    <div class="stat">
+      <strong id="logCount">0</strong>
+      <span>Activity records</span>
+    </div>
+    <div class="stat">
+      <strong id="savedCount">0</strong>
+      <span>Saved streams</span>
+    </div>
+  </div>
+</section>
+
+<section class="panel full">
+  <h2>06 / Activity Logs</h2>
+  <div class="log-list" id="logs">
+    <div class="log info">NEXORA BOT initialized.</div>
+  </div>
+  <div class="actions">
+    <button class="secondary" id="exportBtn">Export Backup</button>
+    <button class="danger" id="clearLogsBtn">Clear Logs</button>
+  </div>
+</section>
+
+<section class="panel full">
+  <h2>07 / Other Platforms</h2>
+  <div class="account">
+    <div class="avatar">K</div>
+    <div>
+      <strong>Kick Bot</strong>
+      <small>Coming soon...</small>
+    </div>
+  </div>
+</section>
+
+<section class="panel full">
+  <h2>08 / Local Settings</h2>
+  <p>Your message, stream URL, and activity records are saved on this device using local storage.</p>
+  <div class="actions">
+    <button class="secondary" id="saveAllBtn">Save All Settings</button>
+    <button class="danger" id="resetBtn">Reset Local Data</button>
+  </div>
+</section>
+
+</div>
+
+<footer>NEXORA BOT • Local Dashboard • YouTube API</footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+
+/* =========================================
+   NEXORA BOT - CONFIGURATION
+========================================= */
+
+const YOUTUBE_API = "https://www.googleapis.com/youtube/v3";
+const OAUTH_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl";
+const STORAGE_KEY = "nexora_bot_local_v2";
+
+let accessToken = null;
+let tokenClient = null;
+let currentLiveChatId = null;
+let currentVideoId = null;
+let currentChannel = null;
+let isSending = false;
+
+const $ = (id) => document.getElementById(id);
+
+const defaultData = {
+  message: "",
+  videoUrl: "",
+  clientId: "",
+  sentCount: 0,
+  sentVideoIds: [],
+  logs: [],
+  savedAt: null
+};
+
+let data = loadData();
+
+/* =========================================
+   LOCAL STORAGE
+========================================= */
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { ...defaultData };
+
+    const parsed = JSON.parse(raw);
+
+    return {
+      ...defaultData,
+      ...parsed,
+      sentVideoIds: Array.isArray(parsed.sentVideoIds)
+        ? parsed.sentVideoIds
+        : [],
+      logs: Array.isArray(parsed.logs)
+        ? parsed.logs
+        : []
+    };
+  } catch (error) {
+    console.error("Storage load error:", error);
+    return { ...defaultData };
+  }
+}
+
+function saveData() {
+  try {
+    data.message = $("messageInput").value;
+    data.videoUrl = $("videoInput").value;
+    data.clientId = $("clientId").value.trim();
+    data.savedAt = new Date().toISOString();
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    updateStats();
+    return true;
+  } catch (error) {
+    console.error("Storage save error:", error);
+    toast("Could not save local data.");
+    return false;
+  }
+}
+
+/* =========================================
+   UI HELPERS
+========================================= */
+
+function toast(message) {
+  const element = $("toast");
+  element.textContent = message;
+  element.style.display = "block";
+
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => {
+    element.style.display = "none";
+  }, 3000);
+}
+
+function setStatus(connected, text) {
+  $("status").classList.toggle("online", connected);
+  $("statusText").textContent = text;
+}
+
+function addLog(message, type = "info") {
+  data.logs.unshift({
+    message: String(message),
+    type,
+    time: new Date().toLocaleString()
+  });
+
+  data.logs = data.logs.slice(0, 100);
+  renderLogs();
+  saveData();
+}
+
+function renderLogs() {
+  const container = $("logs");
+  container.replaceChildren();
+
+  if (!data.logs.length) {
+    const empty = document.createElement("div");
+    empty.className = "log info";
+    empty.textContent = "No activity yet.";
+    container.appendChild(empty);
+  } else {
+    data.logs.forEach(item => {
+      const element = document.createElement("div");
+      element.className = "log " + item.type;
+
+      const message = document.createElement("div");
+      message.textContent = item.message;
+
+      const time = document.createElement("time");
+      time.textContent = item.time;
+
+      element.append(message, time);
+      container.appendChild(element);
+    });
+  }
+
+  updateStats();
+}
+
+function updateStats() {
+  $("sentCount").textContent = data.sentCount;
+  $("logCount").textContent = data.logs.length;
+  $("savedCount").textContent = data.sentVideoIds.length;
+}
+
+function updateSendButton() {
+  $("sendBtn").disabled =
+    !accessToken ||
+    !currentLiveChatId ||
+    !$("confirmChat").checked ||
+    !$("messageInput").value.trim() ||
+    isSending;
+}
+
+function restoreUI() {
+  $("messageInput").value = data.message;
+  $("videoInput").value = data.videoUrl;
+  $("clientId").value = data.clientId;
+
+  updateCharacterCount();
+  renderLogs();
+  updateStats();
+  updateSendButton();
+}
+
+/* =========================================
+   GOOGLE OAUTH
+========================================= */
+
+function validateClientId(value) {
+  return /^[0-9A-Za-z_-]+\.apps\.googleusercontent\.com$/.test(value);
+}
+
+function initializeGoogleLogin() {
+  const clientId = $("clientId").value.trim();
+
+  if (!validateClientId(clientId)) {
+    toast("Enter a valid Google OAuth Client ID first.");
+    return;
+  }
+
+  if (!window.google?.accounts?.oauth2) {
+    toast("Google login library is still loading. Try again.");
+    return;
+  }
+
+  data.clientId = clientId;
+  saveData();
+
+  try {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: OAUTH_SCOPE,
+
+      callback: async (response) => {
+        if (response.error || !response.access_token) {
+          addLog("Google login failed: " + (response.error || "Unknown error"), "error");
+          toast("Google login failed.");
+          return;
+        }
+
+        accessToken = response.access_token;
+
+        try {
+          await loadChannel();
+          setStatus(true, "Google connected");
+          $("loginBtn").textContent = "Connected";
+          $("logoutBtn").disabled = false;
+          addLog("Google account connected successfully.", "ok");
+          updateSendButton();
+        } catch (error) {
+          accessToken = null;
+          setStatus(false, "Connection failed");
+          addLog(error.message, "error");
+          toast(error.message);
+        }
+      },
+
+      error_callback: (error) => {
+        addLog("OAuth error: " + (error.message || "Login failed"), "error");
+      }
+    });
+
+    tokenClient.requestAccessToken({ prompt: "consent" });
+  } catch (error) {
+    addLog("Could not initialize Google login: " + error.message, "error");
+    toast("Google login could not start.");
+  }
+}
+
+async function loadChannel() {
+  const result = await apiRequest(
+    "/channels",
+    { part: "snippet", mine: "true" }
+  );
+
+  if (!result.items || !result.items.length) {
+    throw new Error("No YouTube channel found for this Google account.");
+  }
+
+  currentChannel = result.items[0];
+
+  $("accountName").textContent =
+    currentChannel.snippet.title || "YouTube Channel";
+
+  $("accountInfo").textContent =
+    "YouTube account connected";
+
+  const thumbnail = currentChannel.snippet.thumbnails?.default?.url;
+
+  if (thumbnail) {
+    const avatar = $("accountName").parentElement.previousElementSibling;
+    avatar.textContent = "";
+    avatar.style.backgroundImage = `url("${thumbnail}")`;
+    avatar.style.backgroundSize = "cover";
+  }
+}
+
+function disconnectGoogle() {
+  if (accessToken && window.google?.accounts?.oauth2) {
+    google.accounts.oauth2.revoke(accessToken, () => {});
+  }
+
+  accessToken = null;
+  tokenClient = null;
+  currentChannel = null;
+
+  $("accountName").textContent = "Not logged in";
+  $("accountInfo").textContent = "Connect your YouTube account";
+  $("loginBtn").textContent = "Connect Google";
+  $("logoutBtn").disabled = true;
+
+  const avatar = $("accountName").parentElement.previousElementSibling;
+  avatar.style.backgroundImage = "";
+  avatar.textContent = "▶";
+
+  setStatus(false, "Not connected");
+  updateSendButton();
+
+  addLog("Google account disconnected.", "info");
+}
+
+/* =========================================
+   YOUTUBE API REQUEST
+========================================= */
+
+async function apiRequest(endpoint, params = {}, method = "GET", body = null) {
+  if (!accessToken) {
+    throw new Error("Connect your Google account first.");
+  }
+
+  const url = new URL(YOUTUBE_API + endpoint);
+
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, String(value));
+  });
+
+  const options = {
+    method,
+    headers: {
+      "Authorization": "Bearer " + accessToken,
+      "Accept": "application/json"
+    }
+  };
+
+  if (body !== null) {
+    options.headers["Content-Type"] = "application/json";
+    options.body = JSON.stringify(body);
+  }
+
+  let response;
+
+  try {
+    response = await fetch(url.toString(), options);
+  } catch (error) {
+    throw new Error("Network error. Check your internet connection.");
+  }
+
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("YouTube returned an invalid response.");
+  }
+
+  if (!response.ok) {
+    const apiMessage =
+      result?.error?.message ||
+      "YouTube API request failed (" + response.status + ")";
+
+    throw new Error(apiMessage);
+  }
+
+  return result;
+}
+
+/* =========================================
+   STREAM URL PARSER
+========================================= */
+
+function extractVideoId(input) {
+  const value = input.trim();
+
+  if (/^[a-zA-Z0-9_-]{11}$/.test(value)) {
+    return value;
+  }
+
+  try {
+    const url = new URL(value);
+
+    if (url.hostname === "youtu.be" || url.hostname === "www.youtu.be") {
+      const id = url.pathname.split("/").filter(Boolean)[0];
+      return /^[a-zA-Z0-9_-]{11}$/.test(id || "") ? id : null;
+    }
+
+    if (
+      url.hostname === "youtube.com" ||
+      url.hostname === "www.youtube.com" ||
+      url.hostname === "m.youtube.com" ||
+      url.hostname === "youtube-nocookie.com"
+    ) {
+      const queryId = url.searchParams.get("v");
+
+      if (queryId && /^[a-zA-Z0-9_-]{11}$/.test(queryId)) {
+        return queryId;
+      }
+
+      const parts = url.pathname.split("/").filter(Boolean);
+      const possibleId = parts[1];
+
+      if (
+        ["live", "embed", "shorts"].includes(parts[0]) &&
+        /^[a-zA-Z0-9_-]{11}$/.test(possibleId || "")
+      ) {
+        return possibleId;
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+/* =========================================
+   CHECK LIVE STREAM
+========================================= */
+
+async function checkLiveStream() {
+  if (!accessToken) {
+    toast("Connect Google first.");
+    return;
+  }
+
+  const videoId = extractVideoId($("videoInput").value);
+
+  if (!videoId) {
+    toast("Enter a valid YouTube video URL or ID.");
+    return;
+  }
+
+  $("checkBtn").disabled = true;
+  $("liveTitle").textContent = "Checking...";
+  $("liveInfo").textContent = "Contacting YouTube API";
+
+  try {
+    const result = await apiRequest("/videos", {
+      part: "snippet,liveStreamingDetails",
+      id: videoId
+    });
+
+    if (!result.items || !result.items.length) {
+      throw new Error("Video not found or not accessible.");
+    }
+
+    const video = result.items[0];
+    const liveDetails = video.liveStreamingDetails;
+
+    if (!liveDetails?.activeLiveChatId) {
+      throw new Error("This video has no active live chat.");
+    }
+
+    currentVideoId = videoId;
+    currentLiveChatId = liveDetails.activeLiveChatId;
+
+    $("liveTitle").textContent = video.snippet.title || "Live Stream";
+    $("liveInfo").textContent = "Active live chat found";
+
+    data.videoUrl = $("videoInput").value;
+    saveData();
+
+    addLog("Active live chat found: " + videoId, "ok");
+    toast("Live chat found successfully.");
+  } catch (error) {
+    currentLiveChatId = null;
+    currentVideoId = null;
+
+    $("liveTitle").textContent = "Stream not ready";
+    $("liveInfo").textContent = error.message;
+
+    addLog(error.message, "error");
+    toast(error.message);
+  } finally {
+    $("checkBtn").disabled = false;
+    updateSendButton();
+  }
+}
+
+/* =========================================
+   SEND MESSAGE
+========================================= */
+
+async function sendMessage() {
+  if (isSending) return;
+
+  if (!accessToken || !currentLiveChatId) {
+    toast("Connect Google and check a live stream first.");
+    return;
+  }
+
+  const message = $("messageInput").value.trim();
+
+  if (!message) {
+    toast("Write a message first.");
+    return;
+  }
+
+  if (!$("confirmChat").checked) {
+    toast("Confirm that the chat is open to everyone.");
+    return;
+  }
+
+  if (data.sentVideoIds.includes(currentVideoId)) {
+    toast("A message was already sent to this stream from this device.");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "Send this message to the YouTube live chat?\n\n" + message
+  );
+
+  if (!confirmed) return;
+
+  isSending = true;
+  updateSendButton();
+  $("sendBtn").textContent = "Sending...";
+
+  try {
+    await apiRequest(
+      "/liveChat/messages",
+      { part: "snippet" },
+      "POST",
+      {
+        snippet: {
+          liveChatId: currentLiveChatId,
+          type: "textMessageEvent",
+          textMessageDetails: {
+            messageText: message
+          }
+        }
+      }
+    );
+
+    data.sentCount += 1;
+    data.sentVideoIds.push(currentVideoId);
+    data.sentVideoIds = [...new Set(data.sentVideoIds)].slice(-200);
+
+    saveData();
+
+    addLog("Message sent successfully to stream " + currentVideoId, "ok");
+    toast("Message sent successfully.");
+  } catch (error) {
+    addLog("Message failed: " + error.message, "error");
+    toast(error.message);
+  } finally {
+    isSending = false;
+    $("sendBtn").textContent = "Send Message";
+    updateSendButton();
+  }
+}
+
+/* =========================================
+   EXPORT BACKUP
+========================================= */
+
+function exportBackup() {
+  saveData();
+
+  const backup = {
+    app: "NEXORA BOT",
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    data: {
+      ...data,
+      clientId: data.clientId
+    }
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(backup, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "nexora-backup.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  URL.revokeObjectURL(url);
+  toast("Backup exported.");
+}
+
+/* =========================================
+   EVENTS
+========================================= */
+
+$("loginBtn").addEventListener("click", initializeGoogleLogin);
+$("logoutBtn").addEventListener("click", disconnectGoogle);
+$("checkBtn").addEventListener("click", checkLiveStream);
+$("sendBtn").addEventListener("click", sendMessage);
+
+$("messageInput").addEventListener("input", () => {
+  updateCharacterCount();
+  updateSendButton();
+  saveData();
+});
+
+$("videoInput").addEventListener("change", saveData);
+$("clientId").addEventListener("change", saveData);
+
+$("confirmChat").addEventListener("change", updateSendButton);
+
+function updateCharacterCount() {
+  const length = $("messageInput").value.length;
+  $("charCount").textContent = length + " / 200";
+}
+
+$("saveBtn").addEventListener("click", () => {
+  if (saveData()) {
+    addLog("Message saved locally.", "ok");
+    toast("Message saved.");
+  }
+});
+
+$("saveAllBtn").addEventListener("click", () => {
+  if (saveData()) {
+    addLog("All settings saved locally.", "ok");
+    toast("Settings saved.");
+  }
+});
+
+$("previewBtn").addEventListener("click", () => {
+  const message = $("messageInput").value.trim();
+
+  if (!message) {
+    toast("Write a message first.");
+    return;
+  }
+
+  $("previewText").textContent = message;
+  $("previewBox").style.display = "block";
+});
+
+$("exportBtn").addEventListener("click", exportBackup);
+
+$("clearLogsBtn").addEventListener("click", () => {
+  if (!confirm("Clear all activity logs?")) return;
+
+  data.logs = [];
+  renderLogs();
+  saveData();
+  toast("Logs cleared.");
+});
+
+$("resetBtn").addEventListener("click", () => {
+  if (!confirm("Delete all locally saved NEXORA data?")) return;
+
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.error(error);
+  }
+
+  data = { ...defaultData };
+  disconnectGoogle();
+
+  currentLiveChatId = null;
+  currentVideoId = null;
+
+  $("messageInput").value = "";
+  $("videoInput").value = "";
+  $("clientId").value = "";
+  $("confirmChat").checked = false;
+
+  $("liveTitle").textContent = "No stream selected";
+  $("liveInfo").textContent = "Waiting for a stream";
+
+  renderLogs();
+  restoreUI();
+  toast("Local data reset.");
+});
+
+/* =========================================
+   STARTUP
+========================================= */
+
+restoreUI();
+setStatus(false, "Not connected");
+addLog("NEXORA BOT started.", "info");
+
+</script>
+</body>
+</html>
